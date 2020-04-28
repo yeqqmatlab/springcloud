@@ -1,0 +1,70 @@
+info:
+  appName: Stress鉴权服务
+
+#HTTP配置
+server:
+  port: 8081
+  servlet:
+    context-path: /authorization
+
+spring:
+  application:
+    name: stress-auth-service
+  profiles:
+    active: dev
+
+#注册中心
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址
+    status-page-url-path: ${server.servlet.context-path}/actuator/info
+    health-check-url-path: ${server.servlet.context-path}/actuator/health
+    metadata-map:
+      management.context-path: ${server.servlet.context-path}/actuator
+    app-group-name: stress-test-example
+    initial-status: up
+  #服务中心
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
+
+---
+#开发环境
+spring:
+  profiles: dev
+
+eureka:
+  instance:
+    hostname: 127.0.0.1
+
+#登录相关
+login-token:
+  jwt-issuer: zsy
+  jwt-secret: c0c8cfc5fa9c4cd1b2d93d0fe8e44f40
+  jwt-expire: 360
+  rsa-public-key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N7Mtb1Orj7p2z51SXBeBiS95yUsRLOyFfC1LXntN0ZiTcJD7s8irqr7ckim6WW869JhrlxkYQkH8oHt6Qz3AMQPevx6NlSeUyP7kpnRtuxQ+N8RqOlYA/KQsNDYke3LNBrwj9cEhjv9LjmwyEKPlyJjsJI/qED8bWLkHMDpJiQIDAQAB
+  rsa-private-key: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALk3sy1vU6uPunbPnVJcF4GJL3nJSxEs7IV8LUtee03RmJNwkPuzyKuqvtySKbpZbzr0mGuXGRhCQfyge3pDPcAxA96/Ho2VJ5TI/uSmdG27FD43xGo6VgD8pCw0NiR7cs0GvCP1wSGO/0uObDIQo+XImOwkj+oQPxtYuQcwOkmJAgMBAAECgYEApgZxzJZwT+cEZB/yi7MVNv472lU/vuOgGH+ZMmg86yKoO/G5ZIZhqM/jSmCSmwI0HIrIXhkRW5d5AvTv+kZwAGD0TQtdVt3k4Nj8CJPGbIsBZJZvYYUB2bmWqWnlq1R4z05Q+vjDhpELIwMOJhVsSRlI78fCvfYI5Kmbxa61F+kCQQDxiQR6QgNLsS9vmE38CeD2e8zii+TaS858clx4dtR73g6q3vxZK1bSBS9ux6CrLeLx2WxkxiSfdFOUJlG6UgajAkEAxE9GcnNVo9oW0IdlQig9tlZUK++Ha+41ageHPEvIiqmDeNvrlJu4rV5sxGU1yiq0/nbgfytVaIjqFBvVKllt4wJAQc/EsY9FGJ25wB1uukryyhZneB8IB1b6dzwt6ADw2qNhubsyZRWC/Yy+JOAt7hZ9rMpCV58JoYzvrQFX6X2qIwJAe5x7fIfZTkJ+iTIodZ8HNPBpMf0y5ahqY+h3pGUH0yBoU8sPLVVc1XYWwRgF5dY8f9r1A76Smi9UTfM0p+UGBwJBAM26WxiWBOOPMKmWcSS0PiB4YP6PdFiOq8lisvOOL1k+tqc9NTfAgSOUdqg+yrW6ivR1ca1GEaXMM+n1LA2/iDg=
+  basic-user: zsy
+  basic-password: pBAeYgV9cH8NUJpW
+
+
+
+---
+#生产环境
+spring:
+  profiles: prod
+
+eureka:
+  instance:
+    hostname: 172.19.195.170
+
+#登录相关
+login-token:
+  jwt-issuer: zsy
+  jwt-secret: c0c8cfc5fa9c4cd1b2d93d0fe8e44f40
+  jwt-expire: 360
+  rsa-public-key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N7Mtb1Orj7p2z51SXBeBiS95yUsRLOyFfC1LXntN0ZiTcJD7s8irqr7ckim6WW869JhrlxkYQkH8oHt6Qz3AMQPevx6NlSeUyP7kpnRtuxQ+N8RqOlYA/KQsNDYke3LNBrwj9cEhjv9LjmwyEKPlyJjsJI/qED8bWLkHMDpJiQIDAQAB
+  rsa-private-key: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALk3sy1vU6uPunbPnVJcF4GJL3nJSxEs7IV8LUtee03RmJNwkPuzyKuqvtySKbpZbzr0mGuXGRhCQfyge3pDPcAxA96/Ho2VJ5TI/uSmdG27FD43xGo6VgD8pCw0NiR7cs0GvCP1wSGO/0uObDIQo+XImOwkj+oQPxtYuQcwOkmJAgMBAAECgYEApgZxzJZwT+cEZB/yi7MVNv472lU/vuOgGH+ZMmg86yKoO/G5ZIZhqM/jSmCSmwI0HIrIXhkRW5d5AvTv+kZwAGD0TQtdVt3k4Nj8CJPGbIsBZJZvYYUB2bmWqWnlq1R4z05Q+vjDhpELIwMOJhVsSRlI78fCvfYI5Kmbxa61F+kCQQDxiQR6QgNLsS9vmE38CeD2e8zii+TaS858clx4dtR73g6q3vxZK1bSBS9ux6CrLeLx2WxkxiSfdFOUJlG6UgajAkEAxE9GcnNVo9oW0IdlQig9tlZUK++Ha+41ageHPEvIiqmDeNvrlJu4rV5sxGU1yiq0/nbgfytVaIjqFBvVKllt4wJAQc/EsY9FGJ25wB1uukryyhZneB8IB1b6dzwt6ADw2qNhubsyZRWC/Yy+JOAt7hZ9rMpCV58JoYzvrQFX6X2qIwJAe5x7fIfZTkJ+iTIodZ8HNPBpMf0y5ahqY+h3pGUH0yBoU8sPLVVc1XYWwRgF5dY8f9r1A76Smi9UTfM0p+UGBwJBAM26WxiWBOOPMKmWcSS0PiB4YP6PdFiOq8lisvOOL1k+tqc9NTfAgSOUdqg+yrW6ivR1ca1GEaXMM+n1LA2/iDg=
+  basic-user: zsy
+  basic-password: pBAeYgV9cH8NUJpW

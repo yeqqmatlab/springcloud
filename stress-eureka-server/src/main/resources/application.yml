@@ -1,0 +1,60 @@
+info:
+  appName: 注册中心服务
+
+spring:
+  application:
+    name: stress-eureka-server
+  profiles:
+    active: dev
+
+#HTTP请求日志
+server:
+  port: 8761
+  tomcat:
+    basedir: logs
+    accesslog:
+      enabled: true
+      directory: .
+
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址注册
+    app-group-name: stress-test-example
+  server:
+    eviction-interval-timer-in-ms: 20000
+  client:
+#    register-with-eureka: false #禁止注册
+    fetch-registry: false #禁止获取注册
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+
+---
+#开发环境
+spring:
+  profiles: dev
+
+eureka:
+  instance:
+    hostname: 127.0.0.1
+
+
+
+---
+#生产环境
+spring:
+  profiles: prod
+
+eureka:
+  instance:
+    hostname: 172.19.195.170

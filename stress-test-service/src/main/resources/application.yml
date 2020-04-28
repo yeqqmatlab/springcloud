@@ -1,0 +1,56 @@
+info:
+  appName: Stress Test服务
+
+#HTTP配置
+server:
+  port: 8082
+  servlet:
+    context-path: /test
+
+spring:
+  application:
+    name: stress-test-service
+  profiles:
+    active: dev
+  #处理404
+  mvc:
+    throw-exception-if-no-handler-found: true
+  #处理404
+  resources:
+    add-mappings: false
+
+#注册中心
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址
+    status-page-url-path: ${server.servlet.context-path}/actuator/info
+    health-check-url-path: ${server.servlet.context-path}/actuator/health
+    metadata-map:
+      management.context-path: ${server.servlet.context-path}/actuator
+    app-group-name: stress-test-example
+    initial-status: up
+  #服务中心
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
+
+---
+#开发环境
+spring:
+  profiles: dev
+
+eureka:
+  instance:
+    hostname: 127.0.0.1
+
+
+
+---
+#生产环境
+spring:
+  profiles: prod
+
+eureka:
+  instance:
+    hostname: 172.19.195.170

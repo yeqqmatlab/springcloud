@@ -1,0 +1,155 @@
+info:
+  appName: stress网关服务
+
+server:
+  port: 8080
+  servlet:
+    context-path: cgi
+  #开启压缩
+#  compression:
+#    enabled: true
+#    mime-types:
+#      - application/json
+#    min-response-size: 2048 #超过2kb就压缩
+
+spring:
+  application:
+    name: stress-gateway
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      globalcors:
+        #该配置对性能没有影响
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders:
+              - Authorization
+              - content-type
+              - x-requested-with
+              - X-Real-IP
+              - X-Forwarded-For
+              - Proxy-Client-IP
+              - WL-Proxy-Client-IP
+            allowedMethods:
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      discovery:
+        locator:
+          lower-case-service-id: true
+      routes:
+        - id: stress-test-service
+          uri: lb://stress-test-service
+          predicates:
+            - Path=/${server.servlet.context-path}/test/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: stress-test-service-hystrix
+                fallbackUri: forward:/fallback/stress-test-service
+
+
+#注册中心配置
+eureka:
+  instance:
+    prefer-ip-address: true #使用IP地址
+    health-check-url-path: /actuator/health
+    metadata-map:
+      management.context-path: /actuator
+    app-group-name: stress-test-example
+    initial-status: up
+  #服务中心
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
+
+
+
+
+
+
+#Router Hystrix使用线程隔离#调整Router Hystrix线程池
+#hystrix.threadpool.stress-auth-service.coreSize: 50
+#hystrix.threadpool.stress-auth-service.maximumSize: 500
+#hystrix.threadpool.stress-auth-service.allowMaximumSizeToDivergeFromCoreSize: true
+
+hystrix.command.stress-test-service-hystrix.execution.isolation.strategy: THREAD
+hystrix.command.stress-test-service-hystrix.threadPoolKeyOverride: stress-test-service-htpk
+hystrix.threadpool.stress-test-service-htpk.coreSize: 10
+hystrix.threadpool.stress-test-service-htpk.maximumSize: 500
+hystrix.threadpool.stress-test-service-htpk.allowMaximumSizeToDivergeFromCoreSize: true
+
+#服务熔断设置
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 10000 #默认超时时间
+#hystrix.command.stress-test-service-hystrix.execution.isolation.thread.timeoutInMilliseconds: 20000 #stress-test-service服务超时时间
+
+
+#开启内部服务熔断
+#feign:
+#  client:
+#    config:
+#      stress-auth-service:
+#        connectTimeout: 2000
+#        readTimeout: 10000
+#  hystrix:
+#    enabled: true
+#  httpclient:
+#    enabled: true
+#    max-connections: 200
+#    max-connections-per-route: 50
+
+#网关策略
+gateway:
+  white-list:
+    patterns:
+      - /test/user/say-hellos
+
+logging:
+  level:
+    com.liveinpast.stress.gateway: INFO
+#logging:
+#  level:
+#    org.apache.http.impl.conn: debug
+#    org: debug
+#    org.springframework.cloud.gateway: trace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+#开发环境
+spring:
+  profiles: dev
+
+eureka:
+  instance:
+    hostname: 127.0.0.1
+
+
+---
+#生产环境
+spring:
+  profiles: prod
+
+eureka:
+  instance:
+    hostname: 172.19.195.170
